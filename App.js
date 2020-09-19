@@ -12,7 +12,7 @@ export default class App extends PureComponent {
   };
 
   loadResourcesAsync = async () =>
-    Promise.all([Asset.loadAsync([require("./assets/favicon.png")])]);
+    Promise.all([Asset.loadAsync([require("./assets/images/favicon.png")])]);
 
   handeLoadingError = (error) => {
     console.warn(error);
