@@ -1,10 +1,11 @@
 import { AppState, Dimensions, Text, TextPropTypes } from "react-native";
 import { Floor, Frog, Platform } from "../renderers/renderers.js";
+import { Physics, Tilt } from "../systems/Systems.js";
 import React, { PureComponent } from "react";
 
+import { Accelerometer } from "expo-sensors";
 import { GameEngine } from "react-native-game-engine";
 import Matter from "matter-js";
-import { Physics } from "../systems/Systems.js";
 import { get } from "lodash";
 import randomInt from "random-int";
 
@@ -22,12 +23,33 @@ class Game extends PureComponent {
     this.state = this.initState;
   }
 
+  componentDidMount() {
+    this._subscription = Accelerometer.addListener(({ x }) => {
+      Matter.Body.set(this.refs.engine.state.entities.frog.body, {
+        xtilt: x,
+      });
+    });
+
+    AppState.addEventListener("change", this.handleAppStateChange);
+  }
+
+  componentWillUnmount() {
+    this._subscription && this._subscription.remove();
+    this._subscription = null;
+    AppState.removeEventListener("change", this.handleAppStateChange);
+  }
+
+  handleAppStateChange = (nextAppState) => {
+    this.setState({ appState: nextAppState });
+  };
+
   get initState() {
     return {
       appState: "active",
       entities: this.entities,
     };
   }
+  //create the characters and props dimensions and properties
   get entities() {
     const engine =
       get(this, "state.entities.physics.engine") || Matter.Engine.create();
@@ -36,6 +58,9 @@ class Game extends PureComponent {
     const frog = Matter.Bodies.rectangle(width / 2, height - 350, 25, 25, {
       label: "frog",
       friction: 0.1,
+      restitution: 1,
+      inertia: Infinity,
+      xtilt: 0,
     });
     const platform_0 = Matter.Bodies.rectangle(
       width / 2,
@@ -44,6 +69,7 @@ class Game extends PureComponent {
       10,
       {
         isStatic: true,
+        restitution: 1,
         label: "platform",
       }
     );
@@ -54,6 +80,7 @@ class Game extends PureComponent {
       // isSensor: true,
       label: "floor",
     });
+    // this.collisionHandler(engine);
     Matter.World.add(world, [frog, floor, ...bodies, platform_0]);
 
     return {
@@ -86,6 +113,9 @@ class Game extends PureComponent {
       const objA = pairs[0].bodyA.label;
       const objB = pairs[1].bodyB.label;
       // TODO: setup up frog bounce on platforms
+      if (objA === "frog" && objB === "platform") {
+        //  TODO: send the platforms downward here ??  Matter.Body.
+      }
     });
   };
   // create platforms array
@@ -124,7 +154,7 @@ class Game extends PureComponent {
     return (
       <GameEngine
         ref="engine"
-        systems={[Physics]}
+        systems={[Physics, Tilt]}
         entities={entities}
         running={appState === "active"}
       ></GameEngine>

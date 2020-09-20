@@ -10,4 +10,23 @@ const Physics = (entities, { time }) => {
   return entities;
 };
 
-export { Physics };
+const Tilt = (state) => {
+  const { frog } = state;
+  const xTilt = frog.body.xtilt;
+  let xPos = frog.body.position.x;
+  if (xPos >= width - 13 && xTilt > 0) {
+    xPos = width - 13;
+  } else if (xPos <= 13 && xTilt < 0) {
+    xPos = 13;
+  } else {
+    xPos += xTilt * 100;
+  }
+
+  Matter.Body.setPosition(frog.body, {
+    x: xPos,
+  });
+
+  return state;
+};
+
+export { Physics, Tilt };
