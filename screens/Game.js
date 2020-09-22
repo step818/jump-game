@@ -9,6 +9,7 @@ import Matter from "matter-js";
 import { get } from "lodash";
 import randomInt from "random-int";
 
+const INIT_COMPLEXITY = 0;
 const { width, height } = Dimensions.get("window");
 
 let COUNTER = 1;
@@ -18,9 +19,18 @@ class Game extends PureComponent {
     headerShown: false,
   };
 
-  constructor(props) {
+  constructor() {
     super();
     this.state = this.initState;
+  }
+
+  get initState() {
+    return {
+      complexity: INIT_COMPLEXITY,
+      score: 0,
+      entities: this.entities,
+      appState: "active",
+    };
   }
 
   componentDidMount() {
@@ -31,6 +41,26 @@ class Game extends PureComponent {
     });
 
     AppState.addEventListener("change", this.handleAppStateChange);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { complexity } = this.state;
+    if (complexity !== prevState.complexity && complexity !== INIT_COMPLEXITY) {
+      const { world } = this.engine.props.entities.physics;
+      const { platform, body } = this.platform;
+
+      Matter.World.addBody(world, body);
+      const updatedPlatforms = {
+        ...this.state.entities,
+        [`platform_${COUNTER}`]: platform,
+      };
+
+      COUNTER += 1;
+
+      this.setState({ entities: updatedPlatforms }, () =>
+        this.engine.swap(updatedPlatforms)
+      );
+    }
   }
 
   componentWillUnmount() {
@@ -68,6 +98,7 @@ class Game extends PureComponent {
       25,
       10,
       {
+        friction: 0.1,
         isStatic: true,
         restitution: 1,
         label: "platform",
@@ -115,6 +146,7 @@ class Game extends PureComponent {
       // TODO: setup up frog bounce on platforms
       if (objA === "frog" && objB === "platform") {
         //  TODO: send the platforms downward here ??  Matter.Body.
+        this.setState({ score: score + 1 });
       }
     });
   };
@@ -140,6 +172,7 @@ class Game extends PureComponent {
       25,
       10,
       {
+        friction: 0.1,
         isStatic: true,
         label: "platform",
       }
