@@ -111,7 +111,7 @@ class Game extends PureComponent {
       // isSensor: true,
       label: "floor",
     });
-    // this.collisionHandler(engine);
+    this.collisionHandler(engine);
     Matter.World.add(world, [frog, floor, ...bodies, platform_0]);
 
     return {
@@ -119,6 +119,7 @@ class Game extends PureComponent {
         engine,
         world,
       },
+      ...platforms,
       frog: {
         body: frog,
         size: [25, 25],
@@ -129,7 +130,6 @@ class Game extends PureComponent {
         size: [25, 10],
         renderer: Platform,
       },
-      ...platforms,
       floor: {
         body: floor,
         size: [width + 100, 100],
@@ -142,11 +142,13 @@ class Game extends PureComponent {
     Matter.Events.on(engine, "collisionStart", (event) => {
       const { pairs } = event;
       const objA = pairs[0].bodyA.label;
-      const objB = pairs[1].bodyB.label;
-      // TODO: setup up frog bounce on platforms
+      const objB = pairs[0].bodyB.label;
+      // let frogBottom = this.frog.body.y - frog.size / 2;
+      // let platformTop = this.platform.body.y;
       if (objA === "frog" && objB === "platform") {
         //  TODO: send the platforms downward here ??  Matter.Body.
-        this.setState({ score: score + 1 });
+        console.log("pooop");
+        // this.setState({ score: score + 1 });
       }
     });
   };
@@ -179,7 +181,7 @@ class Game extends PureComponent {
     );
     const platform = { body, size: [25, 10], renderer: Platform };
 
-    return { platform: platform, body };
+    return { platform, body };
   }
 
   render() {
