@@ -141,14 +141,24 @@ class Game extends PureComponent {
   collisionHandler = (engine) => {
     Matter.Events.on(engine, "collisionStart", (event) => {
       const { pairs } = event;
+      // const frog = pairs[0].bodyA
       const objA = pairs[0].bodyA.label;
       const objB = pairs[0].bodyB.label;
-      // let frogBottom = this.frog.body.y - frog.size / 2;
-      // let platformTop = this.platform.body.y;
+      const frogBottom = pairs[0].bodyA.bounds.min.y;
+      const platformTop = pairs[0].bodyB.bounds.max.y;
+      const frogVelocity = pairs[0].bodyA.velocity.y;
       if (objA === "frog" && objB === "platform") {
+        //  Might have to move some constants in here for when objB || jobjA != frog or platform. floor
         //  TODO: send the platforms downward here ??  Matter.Body.
-        console.log("pooop");
-        // this.setState({ score: score + 1 });
+        if (
+          Math.abs(platformTop - frogBottom) < -frogVelocity &&
+          platformTop < frogBottom
+        ) {
+          console.log("Boing!");
+        }
+        console.log(event);
+        // let frogMiddle = objA.position.y;
+        console.log("height of the screen: " + height);
       }
     });
   };
