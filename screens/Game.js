@@ -87,8 +87,6 @@ class Game extends PureComponent {
 
     const frog = Matter.Bodies.rectangle(width / 2, height - 350, 25, 25, {
       label: "frog",
-      friction: 0.1,
-      restitution: 1,
       inertia: Infinity,
       xtilt: 0,
     });
@@ -98,9 +96,7 @@ class Game extends PureComponent {
       25,
       10,
       {
-        friction: 0.1,
         isStatic: true,
-        restitution: 1,
         label: "platform",
       }
     );
@@ -141,11 +137,13 @@ class Game extends PureComponent {
   collisionHandler = (engine) => {
     Matter.Events.on(engine, "collisionStart", (event) => {
       const { pairs } = event;
-      // const frog = pairs[0].bodyA
       const objA = pairs[0].bodyA.label;
       const objB = pairs[0].bodyB.label;
+      // This one is still unknown to me
       const frogBottom = pairs[0].bodyA.bounds.min.y;
+      // This is confirmed the correct value for platformTop
       const platformTop = pairs[0].bodyB.bounds.max.y;
+      // This is confirmed the correct value for velocity
       const frogVelocity = pairs[0].bodyA.velocity.y;
       if (objA === "frog" && objB === "platform") {
         //  Might have to move some constants in here for when objB || jobjA != frog or platform. floor
@@ -154,11 +152,16 @@ class Game extends PureComponent {
           Math.abs(platformTop - frogBottom) < -frogVelocity &&
           platformTop < frogBottom
         ) {
+          console.log(frogVelocity + " : frogVelocity");
           console.log("Boing!");
+          console.log(frogBottom + " : frogBottom");
+          console.log(platformTop + " platformTop");
         }
         console.log(event);
+        console.log("this.frog: " + this.frog);
         // let frogMiddle = objA.position.y;
         console.log("height of the screen: " + height);
+        console.log("The width of the screen: " + width);
       }
     });
   };
@@ -184,7 +187,6 @@ class Game extends PureComponent {
       25,
       10,
       {
-        friction: 0.1,
         isStatic: true,
         label: "platform",
       }
