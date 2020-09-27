@@ -10,6 +10,30 @@ const Physics = (entities, { time }) => {
   return entities;
 };
 
+const Jump = (state, entities) => {
+  const { frog, ...platforms } = state;
+  console.log(frog);
+  console.log(platforms);
+  plats = [];
+  for (item in platforms) {
+    // filter the non platforms out from being pushed in to plats array
+    // if(item is a platform){
+    // plats.push(item)}
+  }
+  // const platforms = Object.values(entities).filter(
+  // (item) => item.body && item.body.label === "platform"
+  // );
+  // now get the frogbottom and platform top and create a jomping force, even just a little one. or makd the platform change colors or somtehing easy
+  const frogBottom = frog.body.bounds.min.y;
+
+  if (
+    Math.abs(plat.body.bounds.max.y - frogBottom) < -frog.body.velocity.y &&
+    plat.body.bounds.max.y < frog.body.bounds.min.y
+  ) {
+    console.log("hello from jump systems");
+  }
+};
+
 const Tilt = (state) => {
   const { frog } = state;
   const xTilt = frog.body.xtilt;
@@ -30,4 +54,4 @@ const Tilt = (state) => {
   return state;
 };
 
-export { Physics, Tilt };
+export { Physics, Tilt, Jump };
