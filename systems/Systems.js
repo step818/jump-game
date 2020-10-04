@@ -10,28 +10,45 @@ const Physics = (entities, { time }) => {
   return entities;
 };
 
-const Jump = (state, entities) => {
-  const { frog, ...platforms } = state;
-  console.log(frog);
-  console.log(platforms);
-  plats = [];
-  for (item in platforms) {
-    // filter the non platforms out from being pushed in to plats array
-    // if(item is a platform){
-    // plats.push(item)}
-  }
+const Trajectory = (entities) => {
+  // const { frog, ...platforms } = state;
+  const platforms = Object.values(entities).filter(
+    (item) => item.body && item.body.label === "platform"
+  );
+  const frog = Object.values(entities).filter(
+    (item) => item.body && item.body.label === "frog"
+  );
+  console.log(frog[0].body.position.y);
+  const frogBottom = frog[0].body.position.y;
+  // console.log("frogBottom: " + frogBottom);
+  console.log(frog[0].body.velocity.y);
+  const frogVelocity = frog[0].body.velocity.y;
+  platforms.forEach((item) => {
+    if (frogBottom < 460) {
+      console.log(item);
+    }
+  });
+
+  console.log(entities);
+  let plats = [];
+  // for (let item in platforms) {
+  // filter the non platforms out from being pushed in to plats array
+  // if(item is a platform){
+  // plats.push(item)}
+  // }
   // const platforms = Object.values(entities).filter(
   // (item) => item.body && item.body.label === "platform"
   // );
   // now get the frogbottom and platform top and create a jomping force, even just a little one. or makd the platform change colors or somtehing easy
-  const frogBottom = frog.body.bounds.min.y;
+  // const frogBottom = frog.body.bounds.min.y;
 
-  if (
-    Math.abs(plat.body.bounds.max.y - frogBottom) < -frog.body.velocity.y &&
-    plat.body.bounds.max.y < frog.body.bounds.min.y
-  ) {
-    console.log("hello from jump systems");
-  }
+  // if (
+  //   Math.abs(plat.body.bounds.max.y - frogBottom) < -frog.body.velocity.y &&
+  //   plat.body.bounds.max.y < frog.body.bounds.min.y
+  // ) {
+  //   console.log("hello from jump systems");
+  // }
+  return entities;
 };
 
 const Tilt = (state) => {
@@ -54,4 +71,4 @@ const Tilt = (state) => {
   return state;
 };
 
-export { Physics, Tilt, Jump };
+export { Physics, Tilt, Trajectory };

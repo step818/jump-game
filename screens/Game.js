@@ -1,6 +1,6 @@
 import { AppState, Dimensions, Text, TextPropTypes } from "react-native";
 import { Floor, Frog, Platform } from "../renderers/renderers.js";
-import { Jump, Physics, Tilt } from "../systems/Systems.js";
+import { Physics, Tilt, Trajectory } from "../systems/Systems.js";
 import React, { PureComponent } from "react";
 
 import { Accelerometer } from "expo-sensors";
@@ -107,7 +107,7 @@ class Game extends PureComponent {
       // isSensor: true,
       label: "floor",
     });
-    this.collisionHandler(engine, frog);
+    // this.collisionHandler(engine);
     Matter.World.add(world, [frog, floor, ...bodies, platform_0]);
 
     return {
@@ -134,7 +134,7 @@ class Game extends PureComponent {
     };
   }
 
-  collisionHandler = (engine, frog) => {
+  collisionHandler = (engine) => {
     Matter.Events.on(engine, "collisionStart", (event) => {
       const { pairs } = event;
       const objA = pairs[0].bodyA.label;
@@ -162,7 +162,6 @@ class Game extends PureComponent {
         // let frogMiddle = objA.position.y;
         console.log("height of the screen: " + height);
         console.log("The width of the screen: " + width);
-        console.log("frog entitie: " + frog);
       }
     });
   };
@@ -202,7 +201,7 @@ class Game extends PureComponent {
     return (
       <GameEngine
         ref="engine"
-        systems={[Physics, Tilt, Jump, Jump]}
+        systems={[Trajectory, Physics, Tilt]}
         entities={entities}
         running={appState === "active"}
       ></GameEngine>
