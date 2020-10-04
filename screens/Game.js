@@ -1,6 +1,6 @@
 import { AppState, Dimensions, Text, TextPropTypes } from "react-native";
 import { Floor, Frog, Platform } from "../renderers/renderers.js";
-import { Physics, Tilt, Trajectory } from "../systems/Systems.js";
+import { Jump, Physics, Tilt } from "../systems/Systems.js";
 import React, { PureComponent } from "react";
 
 import { Accelerometer } from "expo-sensors";
@@ -86,8 +86,13 @@ class Game extends PureComponent {
     const world = engine.world;
 
     const frog = Matter.Bodies.rectangle(width / 2, height - 350, 25, 25, {
+      collisionFilter: {
+        group: 5,
+        category: 1,
+        mask: 0,
+      },
+      frictionAir: 0.015,
       label: "frog",
-      inertia: Infinity,
       xtilt: 0,
     });
     const platform_0 = Matter.Bodies.rectangle(
@@ -104,6 +109,11 @@ class Game extends PureComponent {
     const floor = Matter.Bodies.rectangle(width / 2, height - 10, width, 100, {
       isStatic: true,
       friction: 0.1,
+      collisionFilter: {
+        group: 5,
+        category: 1,
+        mask: 0,
+      },
       // isSensor: true,
       label: "floor",
     });
@@ -140,28 +150,29 @@ class Game extends PureComponent {
       const objA = pairs[0].bodyA.label;
       const objB = pairs[0].bodyB.label;
       // This one is still unknown to me
-      const frogBottom = pairs[0].bodyA.bounds.min.y;
+      const frogBottom = pairs[0].bodyA.position.y + 12.5;
       // This is confirmed the correct value for platformTop
-      const platformTop = pairs[0].bodyB.bounds.max.y;
+      const platformTop = pairs[0].bodyB.position.y - 12.5;
       // This is confirmed the correct value for velocity
       const frogVelocity = pairs[0].bodyA.velocity.y;
       if (objA === "frog" && objB === "platform") {
-        //  Might have to move some constants in here for when objB || jobjA != frog or platform. floor
-        //  TODO: send the platforms downward here ??  Matter.Body.
-        if (
-          Math.abs(platformTop - frogBottom) < -frogVelocity &&
-          platformTop < frogBottom
-        ) {
-          console.log(frogVelocity + " : frogVelocity");
-          console.log("Boing!");
-          console.log(frogBottom + " : frogBottom");
-          console.log(platformTop + " platformTop");
-        }
-        console.log(event);
+        if (Math.abs(frogBottom - (platformTop - 5)) < 3 && frogVelocity > 0) {
+          if (
+            pairs[0].bodyA.position.x - 12.5 <
+              pairs[0].bodyB.position.x + 12.5 &&
+            pairs[0].bodyA.position.x + 12.5 > pairs[0].bodyB.position.x - 12.5
+          ) {
+            console.log(frogVelocity + " : frogVelocity");
+            console.log("Boing!");
+            console.log(frogBottom + " : frogBottom");
+            console.log(platformTop + " platformTop");
+          }
+          console.log(event);
 
-        // let frogMiddle = objA.position.y;
-        console.log("height of the screen: " + height);
-        console.log("The width of the screen: " + width);
+          // let frogMiddle = objA.position.y;
+          console.log("height of the screen: " + height);
+          console.log("The width of the screen: " + width);
+        }
       }
     });
   };
@@ -201,7 +212,7 @@ class Game extends PureComponent {
     return (
       <GameEngine
         ref="engine"
-        systems={[Trajectory, Physics, Tilt]}
+        systems={[Jump, Physics, Tilt]}
         entities={entities}
         running={appState === "active"}
       ></GameEngine>
