@@ -36,11 +36,6 @@ const Jump = (entities) => {
           { x: frog[0].body.position.x, y: frog[0].body.position.y },
           { x: 0, y: -0.05 }
         );
-        Matter.Body.applyForce(
-          item.body,
-          { x: item.body.position.x, y: item.body.position.y },
-          { x: 0, y: 0.05 }
-        );
         console.log("frogBottom: " + frogBottom);
         console.log("platformTop");
         console.log(item.body.position.y - 5);
@@ -51,6 +46,10 @@ const Jump = (entities) => {
   });
 
   return entities;
+};
+
+const MoveScreen = (state) => {
+  const { frog } = state;
 };
 
 const Tilt = (state) => {
